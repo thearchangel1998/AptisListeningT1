@@ -12,29 +12,46 @@
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #f4f7f6;
         }
         .container {
             background-color: #fff;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         h1 {
             text-align: center;
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
         }
         h2 {
             color: #2980b9;
-            margin-top: 30px;
+            margin-top: 35px;
             border-bottom: 1px dashed #bdc3c7;
             padding-bottom: 5px;
         }
-        p {
-            margin-bottom: 15px;
-            font-size: 16px;
+        /* Style cho phần nhập tên */
+        #welcome-screen {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        #student-name-input {
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            width: 300px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        #student-name-input:focus {
+            border-color: #3498db;
+        }
+        /* Ẩn nội dung bài học lúc đầu */
+        #worksheet-content {
+            display: none;
         }
         .speaker {
             font-weight: bold;
@@ -44,17 +61,16 @@
             border: none;
             border-bottom: 2px solid #7f8c8d;
             background-color: transparent;
-            width: 100px;
+            width: 110px;
             text-align: center;
             font-size: 16px;
             font-family: inherit;
-            color: #2c3e50;
             outline: none;
-            transition: border-color 0.3s;
-            margin: 0 5px;
+            transition: all 0.3s;
         }
         input[type="text"]:focus {
             border-bottom: 2px solid #3498db;
+            background-color: #ebf5fb;
         }
         .correct {
             color: #27ae60 !important;
@@ -64,133 +80,163 @@
         .incorrect {
             color: #c0392b !important;
             border-bottom: 2px solid #c0392b !important;
+            background-color: #fdeaea;
         }
         .controls {
             text-align: center;
             margin-top: 40px;
-            position: sticky;
-            bottom: 20px;
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid #eee;
         }
         button {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 15px 40px;
             font-size: 18px;
-            border-radius: 5px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
         button:hover {
             background-color: #2980b9;
+            transform: translateY(-2px);
         }
-        #result {
-            margin-top: 15px;
-            font-size: 18px;
+        #result-display {
+            margin-top: 20px;
+            font-size: 20px;
             font-weight: bold;
-            text-align: center;
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            display: inline-block;
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .student-display {
+            color: #2c3e50;
+            font-style: italic;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Succeed in APTIS - Test 1: Listening</h1>
-    <p><em>Listen to the recordings and fill in the missing words in the blanks.</em></p>
+    <div id="welcome-screen">
+        <h1>Chào mừng đến với Bài nghe APTIS</h1>
+        <p>Vui lòng nhập họ và tên của em để bắt đầu:</p>
+        <input type="text" id="student-name-input" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="off">
+        <br>
+        <button onclick="startLesson()">Bắt đầu làm bài</button>
+    </div>
 
-    <h2>Part 1</h2>
-    <p><strong>0.</strong> <span class="speaker">M:</span> Hi! It's John here. I left my <input type="text" data-answer="coat"> at your house last night. It's a long raincoat with a red <input type="text" data-answer="hood"> at the top. The coat also has a green belt and it's dark blue, almost looks like <input type="text" data-answer="black"> in the dark. When you next come to my house, please can you bring it?</p>
-    
-    <p><strong>1.</strong> <span class="speaker">F:</span> Let's go to the <input type="text" data-answer="shopping"> centre today. Everything at the shoe shop is <input type="text" data-answer="fifty"> percent off. There's a pair of shoes I want to get which normally costs eighty pounds. I will be very happy to buy them for half. John also told me to have a look for a belt and a tie for Sue's <input type="text" data-answer="wedding"> but he doesn't want to spend more than 30 pounds.</p>
-    
-    <p><strong>2.</strong> <span class="speaker">M:</span> My doctor told me to do more exercise because I need to lose <input type="text" data-answer="weight">. I went to the gym yesterday for about an hour and run 6 miles but I prefer to be outside. This morning I went to the <input type="text" data-answer="park"> and ran five miles, I felt great afterwards even if I ran a mile less. I was thinking of running at <input type="text" data-answer="least"> 4 kilometres a day and if I can, some more, depending on the day.</p>
+    <div id="worksheet-content">
+        <h1>Succeed in APTIS - Test 1: Listening</h1>
+        <div id="student-info-tag" class="student-display"></div>
+        <p><em>Nghe đoạn băng và điền từ còn thiếu vào ô trống.</em></p>
 
-    <p><strong>3.</strong> <span class="speaker">F:</span> Hi Jane. Are you free on Saturday night? I have two free tickets to see any film at the local <input type="text" data-answer="cinema">, the one opposite the shopping centre. I want to see the latest <input type="text" data-answer="horror"> film which is on at seven o'clock. Do you want to come with me? If so, call me back soon. Maybe we'll get something to <input type="text" data-answer="eat"> too.</p>
+        <h2>Part 1</h2>
+        <p><strong>0.</strong> <span class="speaker">M:</span> Hi! It's John here. I left my <input type="text" data-answer="coat"> at your house last night. It's a long raincoat with a red <input type="text" data-answer="hood"> at the top. The coat also has a green belt and it's dark blue, almost looks like <input type="text" data-answer="black"> in the dark. When you next come to my house, please can you bring it?</p>
+        
+        <p><strong>1.</strong> <span class="speaker">F:</span> Let's go to the <input type="text" data-answer="shopping"> centre today. Everything at the shoe shop is <input type="text" data-answer="fifty"> percent off. There's a pair of shoes I want to get which normally costs eighty pounds. I will be very happy to buy them for half. John also told me to have a look for a belt and a tie for Sue's <input type="text" data-answer="wedding"> but he doesn't want to spend more than 30 pounds.</p>
+        
+        <p><strong>2.</strong> <span class="speaker">M:</span> My doctor told me to do more exercise because I need to lose <input type="text" data-answer="weight">. I went to the gym yesterday for about an hour and run 6 miles but I prefer to be outside. This morning I went to the <input type="text" data-answer="park"> and ran five miles, I felt great afterwards even if I ran a mile less. I was thinking of running at <input type="text" data-answer="least"> 4 kilometres a day and if I can, some more, depending on the day.</p>
 
-    <p><strong>4.</strong> <span class="speaker">M:</span> When you get to the traffic <input type="text" data-answer="lights">, turn right and then go straight on until you get to the supermarket. Turn <input type="text" data-answer="left"> here and continue down the road where the bus station is, for about half a mile. When you get to the butcher's shop, you will see the <input type="text" data-answer="post"> office across the road.</p>
+        <p><strong>3.</strong> <span class="speaker">F:</span> Hi Jane. Are you free on Saturday night? I have two free tickets to see any film at the local <input type="text" data-answer="cinema">, the one opposite the shopping centre. I want to see the latest <input type="text" data-answer="horror"> film which is on at seven o'clock. Do you want to come with me? If so, call me back soon. Maybe we'll get something to <input type="text" data-answer="eat"> too.</p>
 
-    <p><strong>5.</strong> <span class="speaker">F:</span> The police stopped me the other day while I was driving through town. I thought I had gone through a red light, but I was <input type="text" data-answer="wrong">. Then I wondered if the problem was that I stopped by the chemist's in a no-parking zone. Anyway, I <input type="text" data-answer="smiled"> and gave the policeman my driving licence but he still gave me a ticket for <input type="text" data-answer="speeding">.</p>
+        <p><strong>4.</strong> <span class="speaker">M:</span> When you get to the traffic <input type="text" data-answer="lights">, turn right and then go straight on until you get to the supermarket. Turn <input type="text" data-answer="left"> here and continue down the road where the bus station is, for about half a mile. When you get to the butcher's shop, you will see the <input type="text" data-answer="post"> office across the road.</p>
 
-    <p><strong>6.</strong> <span class="speaker">M:</span> Good evening. Please can I reserve a table for four people this evening? If possible, can we have a table by the <input type="text" data-answer="window"> and not next to the kitchen? Oh and last time we were seated by the <input type="text" data-answer="door"> which was also inconvenient. If that's too much to ask, then dining on the floor will have to do. We will arrive at the restaurant at <input type="text" data-answer="seven"> o'clock.</p>
+        <p><strong>5.</strong> <span class="speaker">F:</span> The police stopped me the other day while I was driving through town. I thought I had gone through a red light, but I was <input type="text" data-answer="wrong">. Then I wondered if the problem was that I stopped by the chemist's in a no-parking zone. Anyway, I <input type="text" data-answer="smiled"> and gave the policeman my driving licence but he still gave me a ticket for <input type="text" data-answer="speeding">.</p>
 
-    <p><strong>7.</strong> <span class="speaker">F:</span> Are you ready for a holiday? We have <input type="text" data-answer="cruise"> ships leaving Southampton once a week and once every two weeks to Greece and America respectively. To get the best price, call us today and get a ten percent <input type="text" data-answer="discount">. Offer is limited for today's bookings and is valid for the month of <input type="text" data-answer="June">.</p>
+        <p><strong>6.</strong> <span class="speaker">M:</span> Good evening. Please can I reserve a table for four people this evening? If possible, can we have a table by the <input type="text" data-answer="window"> and not next to the kitchen? Oh and last time we were seated by the <input type="text" data-answer="door"> which was also inconvenient. If that's too much to ask, then dining on the floor will have to do. We will arrive at the restaurant at <input type="text" data-answer="seven"> o'clock.</p>
 
-    <p><strong>8.</strong> <span class="speaker">M:</span> There is a large car park with five <input type="text" data-answer="floors"> in the middle of the city next to the shopping centre but it costs 10 pounds per hour. The train station car park is more <input type="text" data-answer="affordable"> therefore also an option but if you go behind the old theatre, you can park for <input type="text" data-answer="free">.</p>
+        <p><strong>7.</strong> <span class="speaker">F:</span> Are you ready for a holiday? We have <input type="text" data-answer="cruise"> ships leaving Southampton once a week and once every two weeks to Greece and America respectively. To get the best price, call us today and get a ten percent <input type="text" data-answer="discount">. Offer is limited for today's bookings and is valid for the month of <input type="text" data-answer="June">.</p>
 
-    <p><strong>9.</strong> <span class="speaker">F:</span> Please can I have your attention ladies and gentlemen? As the store is full of <input type="text" data-answer="customers"> today, the shop will be closing an hour later and not at five thirty as shown on the signs. Still, we would like to ask you to proceed to the checkout <input type="text" data-answer="counters"> at about 6 so that there won't be further delays. The shop's coffee shop will close as <input type="text" data-answer="normal"> at five o'clock.</p>
+        <p><strong>8.</strong> <span class="speaker">M:</span> There is a large car park with five <input type="text" data-answer="floors"> in the middle of the city next to the shopping centre but it costs 10 pounds per hour. The train station car park is more <input type="text" data-answer="affordable"> therefore also an option but if you go behind the old theatre, you can park for <input type="text" data-answer="free">.</p>
 
-    <p><strong>10.</strong> <span class="speaker">M:</span> Hello. I saw your advertisement in the local <input type="text" data-answer="newspaper">. I am looking to rent a <input type="text" data-answer="flat"> in the city centre, starting next month. Please can you call me to let me know what flats are available? My name is Jim and my number is 0544 45584. If you can't <input type="text" data-answer="reach"> me for any reason, try my father at 0544 48554. His name is Sam. Thank you.</p>
+        <p><strong>9.</strong> <span class="speaker">F:</span> Please can I have your attention ladies and gentlemen? As the store is full of <input type="text" data-answer="customers"> today, the shop will be closing an hour later and not at five thirty as shown on the signs. Still, we would like to ask you to proceed to the checkout <input type="text" data-answer="counters"> at about 6 so that there won't be further delays. The shop's coffee shop will close as <input type="text" data-answer="normal"> at five o'clock.</p>
 
-    <p><strong>11.</strong> <span class="speaker">F:</span> Oh, the waiter is coming over to our table. Have you decided what you would like to have? Maybe a fruit <input type="text" data-answer="juice"> after all this walking?<br>
-    <span class="speaker">M:</span> I was thinking of having a hot chocolate with some <input type="text" data-answer="cream">.<br>
-    <span class="speaker">F:</span> That sounds delicious. I'm going to have a latte coffee with a slice of cake.<br>
-    <span class="speaker">M:</span> I think I changed my mind. I'm also going to have some chocolate cake but instead of hot chocolate, I'll have a pot of tea. Too many <input type="text" data-answer="calories">, otherwise.</p>
+        <p><strong>10.</strong> <span class="speaker">M:</span> Hello. I saw your advertisement in the local <input type="text" data-answer="newspaper">. I am looking to rent a <input type="text" data-answer="flat"> in the city centre, starting next month. Please can you call me to let me know what flats are available? My name is Jim and my number is 0544 45584. If you can't <input type="text" data-answer="reach"> me for any reason, try my father at 0544 48554. His name is Sam. Thank you.</p>
 
-    <p><strong>12.</strong> <span class="speaker">M:</span> We have to go over to the <input type="text" data-answer="entrance"> over there. Are you going to come around with me?<br>
-    <span class="speaker">F:</span> The museum is really big so I think there will be areas you won't want to see with me.<br>
-    <span class="speaker">M:</span> I would like to see the old cars and factory engines.<br>
-    <span class="speaker">F:</span> I find those things quite <input type="text" data-answer="boring">. You go and look at them and I'll go and look at the old clothes.<br>
-    <span class="speaker">M:</span> Great idea! Let's meet back here in an hour to go see the <input type="text" data-answer="paintings"> together.<br>
-    <span class="speaker">F:</span> Great idea!</p>
+        <p><strong>11.</strong> <span class="speaker">F:</span> Oh, the waiter is coming over to our table. Have you decided what you would like to have? Maybe a fruit <input type="text" data-answer="juice"> after all this walking?<br>
+        <span class="speaker">M:</span> I was thinking of having a hot chocolate with some <input type="text" data-answer="cream">.<br>
+        <span class="speaker">F:</span> That sounds delicious. I'm going to have a latte coffee with a slice of cake.<br>
+        <span class="speaker">M:</span> I think I changed my mind. I'm also going to have some chocolate cake but instead of hot chocolate, I'll have a pot of tea. Too many <input type="text" data-answer="calories">, otherwise.</p>
 
-    <p><strong>13.</strong> <span class="speaker">F:</span> Hello. Can I help you?<br>
-    <span class="speaker">M:</span> Yes. I want to buy a <input type="text" data-answer="gift"> for my brother. It's his birthday next week. I was thinking of maybe a film or a computer game. I know they're on sale at ten pounds fifty.<br>
-    <span class="speaker">F:</span> Do you know what game <input type="text" data-answer="console"> he has?<br>
-    <span class="speaker">M:</span> Oh. No, I don't. Maybe a film on DVD would be better, then. How much is this film?<br>
-    <span class="speaker">F:</span> That's twelve pounds fifty. And I can <input type="text" data-answer="wrap"> it up for a gift for only an extra pound.<br>
-    <span class="speaker">M:</span> No, thanks. There's no need. Here you are.</p>
+        <p><strong>12.</strong> <span class="speaker">M:</span> We have to go over to the <input type="text" data-answer="entrance"> over there. Are you going to come around with me?<br>
+        <span class="speaker">F:</span> The museum is really big so I think there will be areas you won't want to see with me.<br>
+        <span class="speaker">M:</span> I would like to see the old cars and factory engines.<br>
+        <span class="speaker">F:</span> I find those things quite <input type="text" data-answer="boring">. You go and look at them and I'll go and look at the old clothes.<br>
+        <span class="speaker">M:</span> Great idea! Let's meet back here in an hour to go see the <input type="text" data-answer="paintings"> together.<br>
+        <span class="speaker">F:</span> Great idea!</p>
 
-    <h2>Part 2</h2>
-    <p><strong>Speaker A:</strong> Well once the <input type="text" data-answer="exams"> are over I'll be thinking about preparing for university so I'm not really going to get the chance to go on holiday somewhere new and exciting. In fact even a few days in my favourite <input type="text" data-answer="resort"> will probably be out of the question this year. Instead it looks like I'll have to spend the summer months trying to get some money together for <input type="text" data-answer="uni">. Never mind, there will be other summers to have fun.</p>
+        <p><strong>13.</strong> <span class="speaker">F:</span> Hello. Can I help you?<br>
+        <span class="speaker">M:</span> Yes. I want to buy a <input type="text" data-answer="gift"> for my brother. It's his birthday next week. I was thinking of maybe a film or a computer game. I know they're on sale at ten pounds fifty.<br>
+        <span class="speaker">F:</span> Do you know what game <input type="text" data-answer="console"> he has?<br>
+        <span class="speaker">M:</span> Oh. No, I don't. Maybe a film on DVD would be better, then. How much is this film?<br>
+        <span class="speaker">F:</span> That's twelve pounds fifty. And I can <input type="text" data-answer="wrap"> it up for a gift for only an extra pound.<br>
+        <span class="speaker">M:</span> No, thanks. There's no need. Here you are.</p>
 
-    <p><strong>Speaker B:</strong> Actually I'm really looking forward to the summer because I have recently been doing some <input type="text" data-answer="research"> on the internet about my family tree and it's really strange what I discovered. We have been going to a particular seaside resort for years as my parents like it there and it turns out I have a <input type="text" data-answer="cousin"> who lives there. It's highly likely we've even walked past each other in the past but this time we have arranged to meet up. I hope she's as nice as she seems to be on <input type="text" data-answer="Skype">.</p>
+        <h2>Part 2</h2>
+        <p><strong>Speaker A:</strong> Well once the <input type="text" data-answer="exams"> are over I'll be thinking about preparing for university so I'm not really going to get the chance to go on holiday somewhere new and exciting. In fact even a few days in my favourite <input type="text" data-answer="resort"> will probably be out of the question this year. Instead it looks like I'll have to spend the summer months trying to get some money together for <input type="text" data-answer="uni">. Never mind, there will be other summers to have fun.</p>
 
-    <p><strong>Speaker C:</strong> I'm off to my Aunt and Uncle's hotel for the summer. It's a huge place on the <input type="text" data-answer="coast"> that looks over the sea. I haven't been there for years and my parents are going away without me this year so my aunt invited me to spend the summer with them. We get on really well so it should be <input type="text" data-answer="fun">. I offered to help out around the hotel but they insisted that I need a <input type="text" data-answer="rest"> after my exams. I'm quite relieved they said that!</p>
+        <p><strong>Speaker B:</strong> Actually I'm really looking forward to the summer because I have recently been doing some <input type="text" data-answer="research"> on the internet about my family tree and it's really strange what I discovered. We have been going to a particular seaside resort for years as my parents like it there and it turns out I have a <input type="text" data-answer="cousin"> who lives there. It's highly likely we've even walked past each other in the past but this time we have arranged to meet up. I hope she's as nice as she seems to be on <input type="text" data-answer="Skype">.</p>
 
-    <p><strong>Speaker D:</strong> We nearly always go to the same place every year because we like it so much but this year we decided to be a bit more <input type="text" data-answer="adventurous">. In fact we are going to Barcelona in Spain which I've heard is a beautiful city. I really like art and last year I did a painting <input type="text" data-answer="course"> at evening classes so I'm looking forward to visiting all the amazing art galleries in Barcelona. I've been told by some friends that the tapas bars are particularly good in Barcelona so I will probably put on some <input type="text" data-answer="weight">.</p>
+        <p><strong>Speaker C:</strong> I'm off to my Aunt and Uncle's hotel for the summer. It's a huge place on the <input type="text" data-answer="coast"> that looks over the sea. I haven't been there for years and my parents are going away without me this year so my aunt invited me to spend the summer with them. We get on really well so it should be <input type="text" data-answer="fun">. I offered to help out around the hotel but they insisted that I need a <input type="text" data-answer="rest"> after my exams. I'm quite relieved they said that!</p>
 
-    <h2>Part 3</h2>
-    <p><strong>15. Listen to two parents discussing the issue of their child's diet.</strong></p>
-    <p><span class="speaker">M:</span> What's for dinner tonight?<br>
-    <span class="speaker">W:</span> Pizza and salad.<br>
-    <span class="speaker">M:</span> Pizza again! We had that on Wednesday!<br>
-    <span class="speaker">W:</span> I know but Tim really <input type="text" data-answer="fancied"> it.<br>
-    <span class="speaker">M:</span> Well I think you need to give him much less fast food and make him eat <input type="text" data-answer="healthier"> food such as fish or chicken. He hardly ever eats fruit and <input type="text" data-answer="vegetables">. It's important that he eats healthily at his age.<br>
-    <span class="speaker">W:</span> He is having salad with the pizza. He's fifteen now and we can't <input type="text" data-answer="control"> everything he eats. He's not even <input type="text" data-answer="overweight">.<br>
-    <span class="speaker">M:</span> That doesn't necessarily mean that he's healthy and I <input type="text" data-answer="disagree"> that we shouldn't decide on all the meals, after all, we're doing all the shopping and <input type="text" data-answer="cooking">.<br>
-    <span class="speaker">W:</span> Well that's your fault. I wanted to make him more <input type="text" data-answer="independent"> when he was much younger and showed an interest in learning how to cook <input type="text" data-answer="basic"> meals but you said there would be plenty of time for that when he grows up and leaves home.<br>
-    <span class="speaker">M:</span> Look, I'm not saying he shouldn't have any fast food but we really should <input type="text" data-answer="restrict"> it. He's getting in to bad eating habits and I really don't think that he has any idea what a <input type="text" data-answer="balanced"> diet is.<br>
-    <span class="speaker">W:</span> Well he's <input type="text" data-answer="rushing"> out later to go to the cinema with his friends so I wanted to get him something quick and easy. He'll be having a healthy meal with us for the next few <input type="text" data-answer="nights">. Also he's worked so hard for his school exams lately that he deserves a bit of a <input type="text" data-answer="treat">.<br>
-    <span class="speaker">M:</span> That's true. I'm not really <input type="text" data-answer="moaning"> about Tim at all. He's a really good lad on the whole and I'm <input type="text" data-answer="proud"> of him. I just think it's important that we <input type="text" data-answer="maintain"> some quality family time together. Sitting down for a healthy <input type="text" data-answer="evening"> meal is the ideal time to do that. It gives us the perfect chance to <input type="text" data-answer="catch"> up with each other.<br>
-    <span class="speaker">W:</span> <input type="text" data-answer="Absolutely"> and I'm sure Tim feels the same.</p>
+        <p><strong>Speaker D:</strong> We nearly always go to the same place every year because we like it so much but this year we decided to be a bit more <input type="text" data-answer="adventurous">. In fact we are going to Barcelona in Spain which I've heard is a beautiful city. I really like art and last year I did a painting <input type="text" data-answer="course"> at evening classes so I'm looking forward to visiting all the amazing art galleries in Barcelona. I've been told by some friends that the tapas bars are particularly good in Barcelona so I will probably put on some <input type="text" data-answer="weight">.</p>
 
-    <h2>Part 4</h2>
-    <p><strong>16. Listen to a careers advisor talking to a group of students about finding a job.</strong></p>
-    <p>This is a <input type="text" data-answer="voluntary"> seminar being held for students to help them in the search for jobs. Unfortunately the majority of <input type="text" data-answer="undergraduates"> wait until they have graduated before they seriously start considering a long term career. Believe me, this is not the <input type="text" data-answer="sensible"> way forward! The last thing you want to be doing is <input type="text" data-answer="desperately"> trying to find a job when everyone else is and the competition is really <input type="text" data-answer="tough">. The best thing to do is get <input type="text" data-answer="ahead"> of the game. If you put it off too long you may end up <input type="text" data-answer="unemployed"> for a while. You are probably all <input type="text" data-answer="familiar"> with the social networking websites of Facebook and Myspace etc., but networking can also be useful in the world of work. To find the right job, you shouldn't just look through <input type="text" data-answer="adverts"> in newspapers. Although this can be useful, you should also ask the people you already know. Your friends and family are part of your <input type="text" data-answer="network"> and they may know about <input type="text" data-answer="positions"> that you may be interested in. For example, if you have an uncle who works in the business <input type="text" data-answer="sector"> of a bank, ask him about successful local businesses. You may already have a <input type="text" data-answer="part-time"> job in a shop. If you do, then do some research. How else might you work for your current <input type="text" data-answer="employer">? What other <input type="text" data-answer="opportunities"> do they offer? Maybe you've just finished studying for a <input type="text" data-answer="degree"> in accountancy and you have been working part time in a supermarket. Why not ask about accountancy work with your boss? <input type="text" data-answer="Loyalty"> is something that is highly <input type="text" data-answer="valued"> by employers today. In short, you should look closer to home as well as far and wide in your <input type="text" data-answer="search"> for the perfect job.</p>
+        <h2>Part 3</h2>
+        <p><span class="speaker">W:</span> I know but Tim really <input type="text" data-answer="fancied"> it.<br>
+        <span class="speaker">M:</span> Well I think you need to give him much less fast food and make him eat <input type="text" data-answer="healthier"> food such as fish or chicken. He hardly ever eats fruit and <input type="text" data-answer="vegetables">. It's important that he eats healthily at his age.<br>
+        <span class="speaker">W:</span> He is having salad with the pizza. He's fifteen now and we can't <input type="text" data-answer="control"> everything he eats. He's not even <input type="text" data-answer="overweight">.<br>
+        <span class="speaker">M:</span> That doesn't necessarily mean that he's healthy and I <input type="text" data-answer="disagree"> that we shouldn't decide on all the meals, after all, we're doing all the shopping and <input type="text" data-answer="cooking">.<br>
+        <span class="speaker">W:</span> Well that's your fault. I wanted to make him more <input type="text" data-answer="independent"> when he was much younger and showed an interest in learning how to cook <input type="text" data-answer="basic"> meals nhưng bạn nói sẽ có nhiều thời gian cho việc đó khi cậu ấy lớn lên và rời khỏi nhà.<br>
+        <span class="speaker">M:</span> Nhìn xem, tôi không nói cậu ấy không nên ăn đồ ăn nhanh nhưng chúng ta nên <input type="text" data-answer="restrict"> nó. Cậu ấy đang có thói quen ăn uống xấu và tôi không nghĩ cậu ấy hiểu chế độ ăn <input type="text" data-answer="balanced"> là gì.<br>
+        <span class="speaker">W:</span> Cậu ấy đang <input type="text" data-answer="rushing"> ra ngoài đi xem phim với bạn nên tôi muốn làm gì đó nhanh gọn. Cậu ấy sẽ ăn những bữa lành mạnh với chúng ta trong vài <input type="text" data-answer="nights"> tới. Vả lại cậu ấy đã học hành chăm chỉ cho kỳ thi, cậu ấy xứng đáng được <input type="text" data-answer="treat"> một chút.<br>
+        <span class="speaker">M:</span> Đúng vậy. Tôi không <input type="text" data-answer="moaning"> về Tim đâu. Cậu ấy là một đứa trẻ tốt và tôi <input type="text" data-answer="proud"> về cậu ấy. Tôi chỉ nghĩ quan trọng là duy trì <input type="text" data-answer="maintain"> thời gian gia đình bên nhau. Ngồi xuống ăn bữa <input type="text" data-answer="evening"> lành mạnh là lúc lý tưởng. Nó cho chúng ta cơ hội để <input type="text" data-answer="catch"> kịp tin tức của nhau.<br>
+        <span class="speaker">W:</span> <input type="text" data-answer="Absolutely"> và tôi chắc Tim cũng cảm thấy như vậy.</p>
 
-    <p><strong>17. Listen to a woman talking about New Orleans.</strong></p>
-    <p>Whenever I meet a <input type="text" data-answer="stranger"> in New Orleans, one of the first questions I'm asked is where I'm from. It's a loaded question I tend to answer <input type="text" data-answer="warily"> because I have a loaded answer: New York City. It tends to elicit raised eyebrows because there is a general <input type="text" data-answer="perception"> in New Orleans today that the city is being swarmed, occupied and rendered <input type="text" data-answer="unrecognizable"> by New Yorkers. <input type="text" data-answer="Evidence"> would include a handful of popular restaurants opening recently by former New Yorkers; and, most <input type="text" data-answer="significantly">, the doubling and even tripling of <input type="text" data-answer="property"> values in some neighbourhoods, forcing out long time residents, particularly working-class African-Americans. Last year New Orleans <input type="text" data-answer="ranked"> the fastest-growing city in the United States. But most of the new <input type="text" data-answer="citizens"> are not New Yorkers. A study found that only one in nine New Orleanians had not lived in the city <input type="text" data-answer="prior"> to Katrina, meaning that about 80 percent of the increase comes from the return of former residents <input type="text" data-answer="displaced"> by the storm. The new New Orleanians have arrived in two <input type="text" data-answer="phases">. First were city planners, environmentalists, educators, social workers, civil rights <input type="text" data-answer="activists">, and criminal justice reformers who came to help the city rebuild after Katrina; these people largely left the city after three or four years, when <input type="text" data-answer="funding"> ran out. In 2010, the year I moved to the city, a second wave of <input type="text" data-answer="transplants"> began arriving, enticed by the <input type="text" data-answer="robust"> regional economy, seeking opportunities unavailable in more expensive cities. These newcomers were greater in number, more specially <input type="text" data-answer="skilled">, and serious about planting <input type="text" data-answer="domestic"> and economic roots here.</p>
+        <h2>Part 4</h2>
+        <p>Đây là một buổi thảo luận <input type="text" data-answer="voluntary"> dành cho sinh viên để giúp tìm việc làm. Thật không may, đa số sinh viên <input type="text" data-answer="undergraduates"> đợi đến khi tốt nghiệp mới thực sự cân nhắc sự nghiệp lâu dài. Tin tôi đi, đó không phải cách <input type="text" data-answer="sensible">! Điều cuối cùng bạn muốn là <input type="text" data-answer="desperately"> tìm việc khi mọi người cũng đang tìm và sự cạnh tranh rất <input type="text" data-answer="tough">. Cách tốt nhất là đi <input type="text" data-answer="ahead"> trước một bước. Nếu trì hoãn quá lâu, bạn có thể bị <input type="text" data-answer="unemployed"> một thời gian. Có lẽ bạn đã <input type="text" data-answer="familiar"> với các mạng xã hội, nhưng mạng lưới quan hệ cũng rất hữu ích. Đừng chỉ nhìn vào các mẩu <input type="text" data-answer="adverts"> trên báo. Bạn nên hỏi những người bạn đã biết. Bạn bè và gia đình là một phần của <input type="text" data-answer="network"> của bạn, họ có thể biết các vị trí <input type="text" data-answer="positions"> mà bạn quan tâm. Ví dụ, nếu bạn có người chú làm trong lĩnh vực <input type="text" data-answer="sector"> ngân hàng, hãy hỏi chú ấy. Bạn có thể đã có một công việc <input type="text" data-answer="part-time"> trong cửa hàng, hãy nghiên cứu xem còn cơ hội nào khác ở đó không. Chủ <input type="text" data-answer="employer"> luôn đánh giá cao sự trung thành <input type="text" data-answer="loyalty">. Tóm lại, hãy tìm kiếm cả ở gần nhà và ở xa trong quá trình <input type="text" data-answer="search"> tìm công việc hoàn hảo.</p>
 
-    <div class="controls">
-        <div id="result" style="display: block; margin-bottom: 10px;"></div>
-        <button onclick="checkAnswers()">Kiểm tra đáp án</button>
+        <p>Bất cứ khi nào tôi gặp một người <input type="text" data-answer="stranger"> ở New Orleans, họ luôn hỏi tôi đến từ đâu. Tôi thường trả lời một cách <input type="text" data-answer="warily"> vì tôi đến từ New York. Có một quan niệm <input type="text" data-answer="perception"> rằng thành phố này đang bị người New York làm thay đổi đến mức không thể <input type="text" data-answer="unrecognizable"> nhận ra. Bằng chứng <input type="text" data-answer="evidence"> là các nhà hàng mới mở, và quan trọng nhất <input type="text" data-answer="significantly"> là giá bất động sản <input type="text" data-answer="property"> tăng gấp đôi, gấp ba. Năm ngoái, New Orleans được xếp hạng <input type="text" data-answer="ranked"> là thành phố phát triển nhanh nhất, nhưng phần lớn cư dân <input type="text" data-answer="citizens"> mới là những người quay trở lại sau bão Katrina <input type="text" data-answer="prior">. Những người mới đến theo hai giai đoạn <input type="text" data-answer="phases">. Đầu tiên là các nhà quy hoạch, nhà hoạt động <input type="text" data-answer="activists"> xã hội đến giúp tái thiết. Giai đoạn hai từ năm 2010 là những người bị thu hút bởi nền kinh tế <input type="text" data-answer="robust"> mạnh mẽ. Những người này có kỹ năng <input type="text" data-answer="skilled"> chuyên môn cao và nghiêm túc trong việc xây dựng cuộc sống gia đình <input type="text" data-answer="domestic"> tại đây.</p>
+
+        <div class="controls">
+            <div id="result-display"></div>
+            <button onclick="checkAnswers()">Kiểm tra đáp án</button>
+            <button onclick="location.reload()" style="background-color: #95a5a6; margin-left: 10px;">Làm lại bài mới</button>
+        </div>
     </div>
 </div>
 
 <script>
+    let studentName = "";
+
+    function startLesson() {
+        const nameInput = document.getElementById('student-name-input');
+        studentName = nameInput.value.trim();
+        
+        if (studentName === "") {
+            alert("Vui lòng nhập tên của em trước khi bắt đầu!");
+            return;
+        }
+
+        // Ẩn màn hình chào, hiện nội dung bài làm
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('worksheet-content').style.display = 'block';
+        
+        // Hiển thị tên học sinh trong bài
+        document.getElementById('student-info-tag').innerHTML = `Học sinh đang làm bài: <strong>${studentName}</strong>`;
+    }
+
     function checkAnswers() {
-        const inputs = document.querySelectorAll('input[type="text"]');
+        const inputs = document.querySelectorAll('#worksheet-content input[type="text"]');
         let correctCount = 0;
         let total = inputs.length;
 
         inputs.forEach(input => {
             input.classList.remove('correct', 'incorrect');
-            
             const userAnswer = input.value.trim().toLowerCase();
             const correctAnswer = input.getAttribute('data-answer').toLowerCase();
 
@@ -202,16 +248,32 @@
             }
         });
 
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `Bạn đã làm đúng ${correctCount} / ${total} câu!`;
+        const resultDiv = document.getElementById('result-display');
+        resultDiv.style.display = 'block';
+        
+        let message = `Chúc mừng ${studentName}! Em đã hoàn thành bài tập.<br>`;
+        message += `Kết quả: ${correctCount} / ${total} câu đúng.`;
+        
+        resultDiv.innerHTML = message;
+
         if(correctCount === total) {
-            resultDiv.style.color = "#27ae60";
-            resultDiv.innerHTML += " Xuất sắc!";
+            resultDiv.style.backgroundColor = "#d4edda";
+            resultDiv.style.color = "#155724";
         } else {
-            resultDiv.style.color = "#c0392b";
-            resultDiv.innerHTML += " Hãy sửa lại các ô màu đỏ và thử lại nhé.";
+            resultDiv.style.backgroundColor = "#fff3cd";
+            resultDiv.style.color = "#856404";
         }
+        
+        // Cuộn xuống cuối để xem kết quả
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
     }
+
+    // Cho phép nhấn Enter để bắt đầu
+    document.getElementById('student-name-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            startLesson();
+        }
+    });
 </script>
 
 </body>

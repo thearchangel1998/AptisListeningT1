@@ -65,21 +65,44 @@
             font-family: inherit;
             outline: none;
             transition: all 0.3s;
+            color: #2c3e50;
         }
         input[type="text"]:focus {
             border-bottom: 2px solid #3498db;
             background-color: #ebf5fb;
         }
-        .correct {
+        
+        /* Chỉnh style khi ô bị khóa (sau khi nộp bài) */
+        input[type="text"]:disabled {
+            background-color: transparent;
+            cursor: not-allowed;
+            opacity: 1; 
+        }
+        .correct:disabled {
             color: #27ae60 !important;
             border-bottom: 2px solid #27ae60 !important;
             font-weight: bold;
         }
-        .incorrect {
+        .incorrect:disabled {
             color: #c0392b !important;
             border-bottom: 2px solid #c0392b !important;
+            text-decoration: line-through; /* Gạch ngang chữ sai */
             background-color: #fdeaea;
         }
+
+        /* Style cho đáp án đúng hiện ra bên cạnh */
+        .correction-label {
+            color: #27ae60;
+            font-weight: bold;
+            background-color: #e8f8f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+
         .controls {
             text-align: center;
             margin-top: 40px;
@@ -101,6 +124,12 @@
         button:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
         #result-display {
             margin-top: 20px;
@@ -208,7 +237,7 @@
 
         <div class="controls">
             <div id="result-display"></div>
-            <button onclick="checkAnswers()">Kiểm tra đáp án</button>
+            <button id="submit-btn" onclick="checkAnswers()">Kiểm tra đáp án</button>
             <button onclick="location.reload()" style="background-color: #95a5a6; margin-left: 10px;">Làm lại bài mới</button>
         </div>
     </div>
@@ -237,21 +266,20 @@
         let correctCount = 0;
         let total = inputs.length;
 
-        const btnSubmit = document.querySelector('button[onclick="checkAnswers()"]');
+        const btnSubmit = document.getElementById('submit-btn');
         const originalBtnText = btnSubmit.innerHTML;
         btnSubmit.innerHTML = "Đang nộp bài...";
         btnSubmit.disabled = true;
 
+        // Xóa các nhãn đáp án cũ nếu có
+        document.querySelectorAll('.correction-label').forEach(el => el.remove());
+
+        // Đếm số câu đúng trước để chuẩn bị gửi data
         inputs.forEach(input => {
-            input.classList.remove('correct', 'incorrect');
             const userAnswer = input.value.trim().toLowerCase();
             const correctAnswer = input.getAttribute('data-answer').toLowerCase();
-
             if (userAnswer === correctAnswer) {
-                input.classList.add('correct');
                 correctCount++;
-            } else {
-                input.classList.add('incorrect');
             }
         });
 
@@ -273,8 +301,37 @@
         })
         .then(response => response.json())
         .then(data => {
-            btnSubmit.innerHTML = originalBtnText;
-            btnSubmit.disabled = false;
+            // Đã nộp thành công về Sheets, bắt đầu chấm điểm trên màn hình
+            inputs.forEach(input => {
+                input.classList.remove('correct', 'incorrect');
+                input.disabled = true; // Khóa ô nhập liệu lại
+
+                const userAnswer = input.value.trim().toLowerCase();
+                const actualAnswer = input.getAttribute('data-answer'); // Giữ nguyên cách viết hoa/thường để hiển thị
+                const correctAnswer = actualAnswer.toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    input.classList.add('correct');
+                } else {
+                    input.classList.add('incorrect');
+                    
+                    // Nếu học sinh để trống, điền chữ [Trống] để dễ nhìn
+                    if (userAnswer === "") {
+                        input.value = "[Trống]";
+                    }
+                    
+                    // Tạo nhãn hiển thị đáp án đúng kế bên
+                    const correctionSpan = document.createElement('span');
+                    correctionSpan.className = 'correction-label';
+                    correctionSpan.innerHTML = `✓ ${actualAnswer}`;
+                    
+                    // Chèn nhãn vào ngay sau ô input
+                    input.parentNode.insertBefore(correctionSpan, input.nextSibling);
+                }
+            });
+
+            // Ẩn nút nộp bài để không cho nộp lại
+            btnSubmit.style.display = 'none';
 
             const resultDiv = document.getElementById('result-display');
             resultDiv.style.display = 'block';
@@ -296,6 +353,7 @@
         })
         .catch(error => {
             alert("Có lỗi xảy ra khi nộp bài. Vui lòng kiểm tra lại kết nối mạng!");
+            // Nếu lỗi, mở lại nút để nộp lại
             btnSubmit.innerHTML = originalBtnText;
             btnSubmit.disabled = false;
         });

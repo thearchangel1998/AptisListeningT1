@@ -235,6 +235,12 @@
         let correctCount = 0;
         let total = inputs.length;
 
+        // Đổi tên nút thành "Đang nộp bài..." để học sinh biết
+        const btnSubmit = document.querySelector('button[onclick="checkAnswers()"]');
+        const originalBtnText = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = "Đang nộp bài...";
+        btnSubmit.disabled = true;
+
         inputs.forEach(input => {
             input.classList.remove('correct', 'incorrect');
             const userAnswer = input.value.trim().toLowerCase();
@@ -248,24 +254,54 @@
             }
         });
 
-        const resultDiv = document.getElementById('result-display');
-        resultDiv.style.display = 'block';
-        
-        let message = `Chúc mừng ${studentName}! Em đã hoàn thành bài tập.<br>`;
-        message += `Kết quả: ${correctCount} / ${total} câu đúng.`;
-        
-        resultDiv.innerHTML = message;
+        // Hướng dẫn: Dán link Web App URL của bạn vào trong ngoặc kép bên dưới
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykREsthiZspLfsQOT-lXC_3T3NLQUxwQi6UCiBRvyolNMsERBhKDV5sBwpyMdF3dSL/exec"; 
 
-        if(correctCount === total) {
-            resultDiv.style.backgroundColor = "#d4edda";
-            resultDiv.style.color = "#155724";
-        } else {
-            resultDiv.style.backgroundColor = "#fff3cd";
-            resultDiv.style.color = "#856404";
-        }
-        
-        // Cuộn xuống cuối để xem kết quả
-        resultDiv.scrollIntoView({ behavior: 'smooth' });
+        // Đóng gói dữ liệu để gửi
+        const dataToSubmit = {
+            name: studentName,
+            correct: correctCount,
+            total: total
+        };
+
+        // Gửi dữ liệu tới Google Sheets
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify(dataToSubmit)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Khôi phục nút bấm
+            btnSubmit.innerHTML = originalBtnText;
+            btnSubmit.disabled = false;
+
+            // Hiển thị kết quả cho học sinh
+            const resultDiv = document.getElementById('result-display');
+            resultDiv.style.display = 'block';
+            
+            let message = `Chúc mừng ${studentName}! Em đã nộp bài thành công.<br>`;
+            message += `Kết quả: ${correctCount} / ${total} câu đúng.`;
+            
+            resultDiv.innerHTML = message;
+
+            if(correctCount === total) {
+                resultDiv.style.backgroundColor = "#d4edda";
+                resultDiv.style.color = "#155724";
+            } else {
+                resultDiv.style.backgroundColor = "#fff3cd";
+                resultDiv.style.color = "#856404";
+            }
+            
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+            alert("Có lỗi xảy ra khi nộp bài. Vui lòng kiểm tra lại kết nối mạng!");
+            btnSubmit.innerHTML = originalBtnText;
+            btnSubmit.disabled = false;
+        });
     }
 
     // Cho phép nhấn Enter để bắt đầu
@@ -274,6 +310,7 @@
             startLesson();
         }
     });
+</script>
 </script>
 
 </body>
